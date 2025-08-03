@@ -47,7 +47,7 @@
   <div id="scores"></div>
 
   <script>
-    const ws = new WebSocket("wss://buzzin-backend.onrender.com/ws");
+    const ws = new WebSocket("wss://buzzin-app.onrender.com/ws");
 
     ws.onmessage = (msg) => {
       const data = JSON.parse(msg.data);
