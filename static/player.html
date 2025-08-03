@@ -15,7 +15,7 @@
 
     document.getElementById("info").innerText = `You are ${name} (Team ${team})`;
 
-    const ws = new WebSocket("wss://buzzin-backend.onrender.com/ws");
+    const ws = new WebSocket("wss://buzzin-app.onrender.com/ws");
 
     ws.onopen = () => {
       document.getElementById("buzz").disabled = false;
