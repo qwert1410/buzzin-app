@@ -43,9 +43,13 @@
     }
   </style>
 </head>
-<body>
+<body style="display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100vh; background: #fff; font-family: sans-serif;">
   <h2 id="info">Joining...</h2>
-  <button id="buzz" disabled></button>
+
+  <button id="buzz" disabled style="background: none; border: none; cursor: pointer;">
+    <img src="https://upload.wikimedia.org/wikipedia/commons/4/47/Orange_Dinosaur_Vector.svg" alt="Buzz!" style="width: 200px;">
+    <div style="text-align: center; margin-top: -20px; font-size: 24px; font-weight: bold; color: black;">BUZZ</div>
+  </button>
 
   <script>
     const urlParams = new URLSearchParams(window.location.search);
@@ -55,13 +59,14 @@
     document.getElementById("info").innerText = `You are ${name} (Team ${team})`;
 
     const ws = new WebSocket("wss://buzzin-app.onrender.com/ws");
+
     ws.onopen = () => {
-      ws.send(JSON.stringify({ action: "join", name: name, team: team }));
+      ws.send(JSON.stringify({ type: "join", name: name, team: team }));
       document.getElementById("buzz").disabled = false;
     };
 
     document.getElementById("buzz").onclick = () => {
-      ws.send(JSON.stringify({ action: "buzz" }));
+      ws.send(JSON.stringify({ type: "buzz", name: name }));
       document.getElementById("buzz").disabled = true;
     };
 
