@@ -25,8 +25,8 @@ async def websocket_handler(request):
                 data = json.loads(msg.data)
 
                 if data["type"] == "buzz":
-                    if data["name"] not in buzz_order:
-                        buzz_order.append(data["name"])
+                    if not any(player["name"] == data["name"] for player in buzz_order):
+                        buzz_order.append({ "name": data["name"], "team": data["team"] })
                         scores.setdefault(data["name"], 0)
 
                 elif data["type"] == "clear":

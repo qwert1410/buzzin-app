@@ -49,16 +49,24 @@
   <h2 id="info">Joining...</h2>
 
   <button id="buzz" disabled>
-    <img src="https://static.vecteezy.com/system/resources/previews/002/251/453/original/cute-orange-dinosaur-in-cartoon-style-illustration-isolated-on-a-white-background-vector.jpg" alt="Buzz!">
+    <img id="buzz-img" src="" alt="Buzz!">
     <div id="buzz-text">BUZZ</div>
   </button>
 
   <script>
-    const urlParams = new URLSearchParams(window.location.search);
-    const name = urlParams.get("name") || prompt("Enter your name:");
-    const team = urlParams.get("team") || prompt("Enter your team:");
+    const DEFAULT_IMAGE = "https://static.vecteezy.com/system/resources/previews/002/251/453/original/cute-orange-dinosaur-in-cartoon-style-illustration-isolated-on-a-white-background-vector.jpg";
+
+    const name = prompt("Enter your name:");
+    let team = prompt("Choose your team (A or B):");
+
+    while (!["A", "B"].includes(team)) {
+      team = prompt("Invalid team. Please choose A or B:");
+    }
+
+    const customImage = prompt("Optional: Paste a URL to your custom image, or leave blank for dinosaur:");
 
     document.getElementById("info").innerText = `You are ${name} (Team ${team})`;
+    document.getElementById("buzz-img").src = customImage || DEFAULT_IMAGE;
 
     const ws = new WebSocket("wss://buzzin-app.onrender.com/ws");
 
@@ -68,7 +76,7 @@
     };
 
     document.getElementById("buzz").onclick = () => {
-      ws.send(JSON.stringify({ type: "buzz", name: name }));
+      ws.send(JSON.stringify({ type: "buzz", name: name, team: team }));
       document.getElementById("buzz").disabled = true;
     };
 

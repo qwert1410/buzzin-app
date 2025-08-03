@@ -30,9 +30,9 @@
       const data = JSON.parse(msg.data);
       const list = document.getElementById("buzzed");
       list.innerHTML = "";
-      data.buzz_order.forEach(name => {
+      data.buzz_order.forEach(player => {
         const li = document.createElement("li");
-        li.innerText = name;
+        li.innerText = `${player.name} (Team ${player.team})`;
         list.appendChild(li);
       });
       document.getElementById("scoreA").innerText = data.scores.A || 0;
