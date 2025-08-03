@@ -1,0 +1,54 @@
+<!-- host.html -->
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Host Control</title>
+</head>
+<body>
+  <h2>Buzzed Players</h2>
+  <ul id="buzzed"></ul>
+
+  <h2>Scores</h2>
+  <div>
+    Team A: <span id="scoreA">0</span>
+    <button onclick="modify('A', 1)">+1</button>
+    <button onclick="modify('A', -1)">-1</button>
+  </div>
+  <div>
+    Team B: <span id="scoreB">0</span>
+    <button onclick="modify('B', 1)">+1</button>
+    <button onclick="modify('B', -1)">-1</button>
+  </div>
+
+  <br>
+  <button onclick="clearBuzz()">Clear Buzzers</button>
+
+  <script>
+    const ws = new WebSocket("ws://192.168.0.45:8000");
+
+    ws.onmessage = (msg) => {
+      const data = JSON.parse(msg.data);
+      const list = document.getElementById("buzzed");
+      list.innerHTML = "";
+      data.buzz_order.forEach(name => {
+        const li = document.createElement("li");
+        li.innerText = name;
+        list.appendChild(li);
+      });
+      document.getElementById("scoreA").innerText = data.scores.A;
+      document.getElementById("scoreB").innerText = data.scores.B;
+    };
+
+    function clearBuzz() {
+      ws.send(JSON.stringify({ action: "clear" }));
+    }
+
+    function modify(team, delta) {
+      ws.send(JSON.stringify({
+        action: delta > 0 ? "add_point" : "sub_point",
+        team: team
+      }));
+    }
+  </script>
+</body>
+</html>
