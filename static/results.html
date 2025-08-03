@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Scoreboard</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <style>
+    body {
+      font-family: sans-serif;
+      text-align: center;
+      background: #111;
+      color: #fff;
+    }
+    h1 {
+      margin-top: 20px;
+    }
+    .bar {
+      height: 40px;
+      margin: 10px 0;
+      background: #444;
+      position: relative;
+      border-radius: 8px;
+      overflow: hidden;
+    }
+    .fill {
+      height: 100%;
+      background: #4caf50;
+      text-align: left;
+      padding-left: 10px;
+      line-height: 40px;
+      font-weight: bold;
+      white-space: nowrap;
+      transition: width 0.5s ease;
+    }
+    .label {
+      position: absolute;
+      left: 10px;
+      top: 0;
+      height: 100%;
+      display: flex;
+      align-items: center;
+      font-weight: bold;
+    }
+  </style>
+</head>
+<body>
+  <h1>📊 Live Scoreboard</h1>
+  <div id="scores"></div>
+
+  <script>
+    const ws = new WebSocket("wss://buzzin-backend.onrender.com/ws");
+
+    ws.onmessage = (msg) => {
+      const data = JSON.parse(msg.data);
+      const scores = data.scores || {};
+      const container = document.getElementById("scores");
+
+      // Clear and rebuild
+      container.innerHTML = "";
+
+      const entries = Object.entries(scores).sort((a, b) => b[1] - a[1]);
+      const max = Math.max(...entries.map(([_, score]) => score), 1);
+
+      entries.forEach(([name, score]) => {
+        const percent = (score / max) * 100;
+
+        const bar = document.createElement("div");
+        bar.className = "bar";
+
+        const fill = document.createElement("div");
+        fill.className = "fill";
+        fill.style.width = percent + "%";
+        fill.innerText = `${name}: ${score}`;
+
+        bar.appendChild(fill);
+        container.appendChild(bar);
+      });
+    };
+  </script>
+</body>
+</html>

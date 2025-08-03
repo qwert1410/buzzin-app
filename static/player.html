@@ -1,12 +1,65 @@
-<!-- player.html -->
 <!DOCTYPE html>
 <html>
 <head>
   <title>Buzzer</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <style>
+    body {
+      margin: 0;
+      background: #111;
+      color: white;
+      font-family: sans-serif;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      height: 100vh;
+    }
+
+    #info {
+      margin-bottom: 20px;
+      font-size: 1.2em;
+    }
+
+    #buzz {
+      width: 200px;
+      height: 200px;
+      border: none;
+      border-radius: 50%;
+      background: orange;
+      color: black;
+      font-weight: bold;
+      font-size: 1.5em;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-direction: column;
+      box-shadow: 0 0 20px rgba(255, 165, 0, 0.6);
+      transition: transform 0.2s ease;
+    }
+
+    #buzz:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+
+    #buzz:hover {
+      transform: scale(1.05);
+    }
+
+    #dino {
+      font-size: 3em;
+      margin-bottom: 8px;
+    }
+  </style>
 </head>
 <body>
   <h2 id="info">Joining...</h2>
-  <button id="buzz" disabled>BUZZ!</button>
+  <button id="buzz" disabled>
+    <div id="dino">🦖</div>
+    BUZZ
+  </button>
 
   <script>
     const urlParams = new URLSearchParams(window.location.search);
@@ -15,18 +68,15 @@
 
     document.getElementById("info").innerText = `You are ${name} (Team ${team})`;
 
-    const ws = new WebSocket("wss://buzzin-app.onrender.com/ws");
+    const ws = new WebSocket("wss://buzzin-backend.onrender.com/ws");
 
     ws.onopen = () => {
+      ws.send(JSON.stringify({ type: "join", name: name, team: team }));
       document.getElementById("buzz").disabled = false;
     };
 
     document.getElementById("buzz").onclick = () => {
-      ws.send(JSON.stringify({
-        type: "buzz",
-        name: name,
-        team: team
-      }));
+      ws.send(JSON.stringify({ type: "buzz", name: name }));
       document.getElementById("buzz").disabled = true;
     };
 
