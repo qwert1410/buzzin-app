@@ -1,63 +1,53 @@
-# === server.py ===
-# Backend using websockets to manage buzzers and teams
-
 import asyncio
-import websockets
 import json
 import os
+from aiohttp import web
+import websockets
+from websockets import WebSocketServerProtocol
 
 clients = set()
 buzz_order = []
-players = {}  # socket: {"name": str, "team": str}
-scores = {"A": 0, "B": 0}
+scores = {}
 
 async def notify_all():
     if clients:
-        data = {
-            "buzz_order": buzz_order,
-            "scores": scores
-        }
-        message = json.dumps(data)
+        message = json.dumps({"buzz_order": buzz_order, "scores": scores})
         await asyncio.gather(*(client.send(message) for client in clients))
 
-
-async def handler(websocket):
-    clients.add(websocket)
+async def ws_handler(ws: WebSocketServerProtocol):
+    clients.add(ws)
     try:
-        async for message in websocket:
+        async for message in ws:
             data = json.loads(message)
-
-            if data["action"] == "join":
-                players[websocket] = {"name": data["name"], "team": data["team"]}
-
-            elif data["action"] == "buzz":
-                if players[websocket]["name"] not in buzz_order:
-                    buzz_order.append(players[websocket]["name"])
-
-            elif data["action"] == "clear":
+            if data["type"] == "buzz":
+                if data["name"] not in buzz_order:
+                    buzz_order.append(data["name"])
+                    scores.setdefault(data["name"], 0)
+            elif data["type"] == "clear":
                 buzz_order.clear()
-
-            elif data["action"] == "add_point":
-                scores[data["team"]] += 1
-
-            elif data["action"] == "sub_point":
-                scores[data["team"]] -= 1
-
+            elif data["type"] == "score":
+                scores[data["name"]] = scores.get(data["name"], 0) + int(data["delta"])
             await notify_all()
-
-    except websockets.ConnectionClosed:
-        pass
     finally:
-        clients.remove(websocket)
-        if websocket in players:
-            del players[websocket]
+        clients.remove(ws)
 
+async def http_handler(request):
+    return web.Response(text="Buzzin WebSocket server is up.")
 
-PORT = int(os.environ.get("PORT", 8000))
+async def start_servers():
+    port = int(os.environ.get("PORT", 8000))
 
-async def main():
-    async with websockets.serve(handler, "", PORT):
-        print(f"Server running on ws://0.0.0.0:{PORT}")
-        await asyncio.Future()
+    # Start WebSocket server
+    await websockets.serve(ws_handler, "0.0.0.0", port)
 
-asyncio.run(main())
+    # HTTP server for health checks
+    app = web.Application()
+    app.router.add_get("/", http_handler)
+    runner = web.AppRunner(app)
+    await runner.setup()
+    site = web.TCPSite(runner, "0.0.0.0", port + 1)
+    await site.start()
+
+    await asyncio.Future()
+
+asyncio.run(start_servers())
