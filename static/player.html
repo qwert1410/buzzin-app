@@ -16,25 +16,27 @@
     }
 
     #buzz {
-      width: 200px;
-      height: 200px;
-      background: url('https://upload.wikimedia.org/wikipedia/commons/thumb/1/14/Dino_icon_2022.svg/512px-Dino_icon_2022.svg.png') no-repeat center center;
-      background-size: contain;
+      background: none;
       border: none;
       cursor: pointer;
-      color: black;
-      font-size: 28px;
-      font-weight: bold;
-      text-shadow: 1px 1px 2px white;
-      position: relative;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
     }
 
-    #buzz::after {
-      content: "BUZZ";
-      position: absolute;
-      bottom: 10px;
-      left: 50%;
-      transform: translateX(-50%);
+    #buzz img {
+      width: 200px;
+      height: auto;
+    }
+
+    #buzz-text {
+      margin-top: -20px;
+      font-size: 24px;
+      font-weight: bold;
+      color: black;
+      background-color: white;
+      padding: 5px 10px;
+      border-radius: 8px;
     }
 
     #buzz:disabled {
@@ -43,12 +45,12 @@
     }
   </style>
 </head>
-<body style="display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100vh; background: #fff; font-family: sans-serif;">
+<body>
   <h2 id="info">Joining...</h2>
 
-  <button id="buzz" disabled style="background: none; border: none; cursor: pointer;">
-    <img src="https://upload.wikimedia.org/wikipedia/commons/4/47/Orange_Dinosaur_Vector.svg" alt="Buzz!" style="width: 200px;">
-    <div style="text-align: center; margin-top: -20px; font-size: 24px; font-weight: bold; color: black;">BUZZ</div>
+  <button id="buzz" disabled>
+    <img src="https://static.vecteezy.com/system/resources/previews/002/251/453/original/cute-orange-dinosaur-in-cartoon-style-illustration-isolated-on-a-white-background-vector.jpg" alt="Buzz!">
+    <div id="buzz-text">BUZZ</div>
   </button>
 
   <script>
