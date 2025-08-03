@@ -24,7 +24,7 @@
   <button onclick="clearBuzz()">Clear Buzzers</button>
 
   <script>
-    const ws = new WebSocket("ws://192.168.0.45:8000");
+    const ws = new WebSocket("wss://buzzin-backend.onrender.com");
 
     ws.onmessage = (msg) => {
       const data = JSON.parse(msg.data);
